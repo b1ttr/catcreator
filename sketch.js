@@ -6,7 +6,8 @@ function preload() {
   let prefix = "https://qbttr.github.com/catcreator";
   let suffix = ".png";
   let folders = [
-    "Body", "Ears", "Eyes", "Hair", "Head", "Tail", "Accessories"
+    "Body", "Ears", "Hair", "Head", "Face/Eyes", "Face/Mouth", "Face/Nose", "Tail",
+    "Accessories/Body", "Accessories/Hair", "Accessories/Head",
     "Legs/FrontLeft", "Legs/FrontRight", "Legs/BackLeft", "Legs/BackRight"
   ]
 
