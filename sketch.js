@@ -27,27 +27,27 @@ function preload() {
 
   for (var k of Object.keys(folders)) {
     let folder = folders[k];
-    n = toLowerCase(k);
+    n = k.toLowerCase();
     images[n] = new Array(folder.count);
     for (var i = 0; i < images[n].length; i++) {
       images[n][i] = getImages(i, k, folder);
     }
   }
 
-  function getImages(i, folder, info) {
+  function getImages(count, path, info) {
     let prefix = "https://qbttr.github.com/catcreator/Assets";
     let suffix = ".png";
 
     let item = {};
 
     for (var c of ["line", "base", "colour"])
-    if(info.content.includes(c)) item[c] = loadImage(prefix+folder+"/"+i+"/" +c+suffix);
+    if(info.content.includes(c)) item[c] = loadImage(prefix+path+"/"+count+"/" +c+suffix);
 
     for (var c of ["patterns", "overlays", "accents"])
     if(info.hasOwnProperty(c)) {
       item[c] = new Array(info[c]);
       for (var i = 0; i < items[c].length; i++)
-      item[c][i] = loadImage(prefix+folder+"/"+i+"/"+c+"/"+i+suffix);
+      item[c][i] = loadImage(prefix+path+"/"+count+"/"+c+"/"+i+suffix);
     }
 
     return item;
