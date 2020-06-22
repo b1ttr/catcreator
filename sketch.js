@@ -5,7 +5,7 @@
 let folders = {
   "Accessories/Body/back": { count:4, content:"line base" },
   "Accessories/Body/collar": { count:5, content:"line base colour" },
-  "Accessories/Hair":{ count:5, content:"line base colour" },
+  "Accessories/Hair":{ count:5, content:"line base" },
   "Accessories/Head":{ count:1, content:"base"},
   "Body": { count:1, content:"line base", patterns:13 , overlays:10 },
   "Ears": { count:5, content:"line base", patterns:3 , overlays:4 },
@@ -35,7 +35,7 @@ function preload() {
   }
 
   function getImages(count, path, info) {
-    let prefix = "https://qbttr.github.com/catcreator/Assets/";
+    let prefix = "https://qbttr.github.io/catcreator/Assets/";
     let suffix = ".png";
 
     let item = {};
