@@ -5,7 +5,7 @@
 let folders = {
   "Accessories/Body/back": { count:4, content:"line base" },
   "Accessories/Body/collar": { count:5, content:"line base colour" },
-  "Accessories/Hair":{ count:5, content:"line base" },
+  "Accessories/Hair":{ count:3, content:"line base" },
   "Accessories/Head":{ count:1, content:"base"},
   "Body": { count:1, content:"line base", patterns:13 , overlays:10 },
   "Ears": { count:5, content:"line base", patterns:3 , overlays:4 },
