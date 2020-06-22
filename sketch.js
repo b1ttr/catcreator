@@ -35,7 +35,7 @@ function preload() {
   }
 
   function getImages(count, path, info) {
-    let prefix = "https://qbttr.github.com/catcreator/Assets";
+    let prefix = "https://qbttr.github.com/catcreator/Assets/";
     let suffix = ".png";
 
     let item = {};
@@ -46,7 +46,7 @@ function preload() {
     for (var c of ["patterns", "overlays", "accents"])
     if(info.hasOwnProperty(c)) {
       item[c] = new Array(info[c]);
-      for (var i = 0; i < items[c].length; i++)
+      for (var i = 0; i < item[c].length; i++)
       item[c][i] = loadImage(prefix+path+"/"+count+"/"+c+"/"+i+suffix);
     }
 
