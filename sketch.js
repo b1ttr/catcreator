@@ -13,7 +13,7 @@ let folders = {
   "Face/Mouth": { count:4, content:"line" },
   "Face/Nose": { count:3, content:"line" },
   "Hair": { count:2, content:"line base" },
-  "Head":{ count:1, content:"line base", patterns:5 , overlays:7, accents: 3},
+  "Head":{ count:1, content:"line base", patterns:5 , overlays:7, accents: 1, topaccents: 2},
   "Legs/LeftBack": { count:1, content:"line base", patterns:3 , overlays:4 },
   "Legs/LeftFront": { count:1, content:"line base", patterns:3 , overlays:4 },
   "Legs/RightBack": { count:1, content:"line base", patterns:3 , overlays:4 },
@@ -43,7 +43,7 @@ function preload() {
     for (var c of ["line", "base", "colour"])
     if(info.content.includes(c)) item[c] = loadImage(prefix+path+"/"+count+"/" +c+suffix);
 
-    for (var c of ["patterns", "overlays", "accents"])
+    for (var c of ["patterns", "overlays", "accents", "topaccents"])
     if(info.hasOwnProperty(c)) {
       item[c] = new Array(info[c]);
       for (var i = 0; i < item[c].length; i++)
