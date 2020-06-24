@@ -6,7 +6,7 @@ let folders = {
   "Accessories/Body/back": { count:4, content:"line base" },
   "Accessories/Body/collar": { count:5, content:"line base colour" },
   "Accessories/Hair":{ count:3, content:"line base" },
-  "Accessories/Head":{ count:1, content:"base"},
+  "Accessories/Head":{ count:1, content:"colour"},
   "Body": { count:1, content:"line base", patterns:13 , overlays:10 },
   "Ears": { count:5, content:"line base", patterns:3 , overlays:4, accents:1, accentsMissing: [0] },
   "Face/Eyes": { count:4, content:"line base" },
@@ -22,19 +22,20 @@ let folders = {
 };
 
 let images = {};
-images.width = 2048;
-images.height = 2048;
+images.width = 1024;
+images.height = 1024;
 
 let loading = true;
 let totalImages = 221;
 let progress = 0;
 
-function imageLoaded() {
+function imageLoaded(img) {
+  if(img.width != images.width) img.resize(images.width, images.height);
   progress++;
   if(progress >= totalImages) loading = false;
 }
 
-function loadCat() {
+function loadImages() {
   for (var k of Object.keys(folders)) {
     let folder = folders[k];
     n = k.toLowerCase();
@@ -65,44 +66,52 @@ function loadCat() {
   }
 }
 
-function loadColours() {
+let PALETTE = [
+  "#2c2c2c", "#4c4c4c", "#6f6f6f", "#cdcdcd", "#f4f2ef",
+  "#505865", "#969fb0", "#aeb8ca", "#cbd4e6", "#e4ecfd",
+  "#726564", "#d7cabd", "#bfbece", "#a6bffa", "#b4bebf",
+  "#413027", "#71564a", "#957160", "#b89a8b", "#b8a8a0",
+  "#5e423d", "#9e655b", "#cb8679", "#f0a79a", "#ecbf8a",
+  "#d5846f", "#e6ac8e", "#f9dabc", "#fef5da", "#ecd79c",
+  "#ec575d", "#e47a80", "#f19cb6", "#f7cbca", "#caf6b7",
+  "#ea9ee8", "#9a97f0", "#71a2f8", "#77c3af", "#dff79f",
+  "#dbb9ed", "#cbc9f9", "#c5fcee", "#8ba38e", "#bac49a"
+]
+let colours = new Array(PALETTE.length);
 
+function loadColours() {
+  for (var i = 0; i < colours.length; i++) {
+    colours[i] = createImage(1,1);
+    colours[i].loadPixels();
+    colours[i].set(0,0,color(PALETTE[i]));
+    colours[i].updatePixels();
+    colours[i].resize(images.width, images.height);
+  }
 }
+
+let firstCat;
 
 function setup() {
-  createCanvas(500,500);
 
-  loadCat();
+  cvs = createCanvas(800,800);
+  // canvasElement = cvs.elt;
+  // ctx = canvasElement.getContext('2d');
+  // ctx.mozImageSmoothingEnabled = false;
+  // ctx.webkitImageSmoothingEnabled = false;
+  // ctx.msImageSmoothingEnabled = false;
+  // ctx.imageSmoothingEnabled = false;
+  //
+  // p5.disableFriendlyErrors = true;
 
-  let cat = {
-    "Accessories/Body/back": { index:-1 , base: 0 },
-    "Accessories/Body/collar": { index:0, base: 0 },
-    "Accessories/Hair":{ index:-1, base:0 },
-    "Accessories/Head":{ index:-1, base:0 },
-    "Body": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-    "Ears": {
-      index:0, base:0, pattern:0, overlay:0, acctent:0,
-      patternClr:0, overlayClr:0, acctentClr:0
-    },
-    "Face/Eyes": { index:0, base:0 },
-    "Face/Mouth": { index:0 },
-    "Face/Nose": { index:0 },
-    "Hair": { index:0, base:0 },
-    "Head": {
-      index:0, base:0, pattern:0, overlay:0, acctent:0, topacctent:0,
-      patternClr:0, overlayClr:0, acctentClr:0, topacctentClr:0
-    },
-    "Legs/LeftBack": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-    "Legs/LeftFront": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-    "Legs/RightBack": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-    "Legs/RightFront": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-    "Tail":{ index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-  }
+  loadColours();
+  loadImages();
 
 }
 
+let timer = 0;
+
 function draw() {
-  background(0);
+  background(100);
 
   if(loading) {
     fill(100);
@@ -110,6 +119,52 @@ function draw() {
     rect(0, 0, w, height);
     return;
   }
+
+  firstCat = {
+    "accessories/body/back": { index:-1 , base: 0 },
+    "accessories/body/collar": { index:1, base: 0 },
+    "accessories/hair":{ index:-1, base:0 },
+    "accessories/head":{ index:-1, base:0 },
+    "body": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
+    "ears": {
+      index:0, base:0, pattern:0, overlay:0, acctent:0,
+      patternClr:0, overlayClr:0, acctentClr:0
+    },
+    "face/eyes": { index:0, base:0 },
+    "face/mouth": { index:0 },
+    "face/nose": { index:0 },
+    "hair": { index:0, base:0 },
+    "head": {
+      index:0, base:0, pattern:0, overlay:0, acctent:0, topacctent:0,
+      patternClr:0, overlayClr:0, acctentClr:0, topacctentClr:0
+    },
+    "legs/leftback": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
+    "legs/leftfront": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
+    "legs/rightback": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
+    "legs/rightfront": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
+    "tail": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
+  }
+
+  for (var k of Object.keys(folders)) {
+    let lk = k.toLowerCase();
+    if(lk.includes("accessories")) firstCat[lk].index = floor(random(-1,folders[k].count));
+    else firstCat[lk].index = floor(random(folders[k].count));
+    console.log(lk + " " + firstCat[lk]);
+    for (var c of ["pattern", "overlay", "accent", "topaccent"])
+    if(firstCat[lk].hasOwnProperty(c)) firstCat[lk][c] = floor(random(folders[k][c+"s"]));
+  }
+
+  timer = millis();
+  console.log("start genCat");
+
+  let cat = genCat(firstCat);
+
+  console.log("genCat took: " + (millis() - timer)/1000 + "s");
+
+  for (var i of cat) {
+    image(i, 0, 0, width, height);
+  }
+  // image(cat, 0, 0, width, height);
 
   noLoop();
 
@@ -119,69 +174,73 @@ function genCat(cat) {
   let I = images;
 
   // create master image
-  let master = createImage(I.width, I.height);
+  // let master = createImage(images.width, images.height);
+  let master = [];
+
+  part("legs/leftback");
+  part("legs/leftfront");
+
+  part("tail");
+
+  part("body");
+
+  part("accessories/body/collar");
+  part("accessories/body/back");
+
+  part("legs/rightback");
+  part("legs/rightfront");
+
+  part("head");
+  part("face/mouth");
+  part("face/nose");
+  part("face/eyes");
+  part("accessories/head");
+
+  part("ears");
+  part("hair");
+  part("accessories/hair");
+
 
   function part(p) {
+    if(cat[p].index < 0) return;
     let part = I[p][cat[p].index];
-    for (var c of ["base", "colour", "line"])
-    if(part.hasOwnProperty(c)) add(part[c], c == "base" ? cat[p].base:'plain');
+    console.log(p + " " + cat[p].index);
+    // for (var c of ["base", "line", "colour"])
+    // if(part.hasOwnProperty(c)) add(part[c], c == "base" ? cat[p].base:'plain');
+    if(part.hasOwnProperty("base")) add(part.base, cat[p].base);
 
     for (var c of ["pattern", "overlay", "accent", "topaccent"])
     if(part.hasOwnProperty(c+"s") && part[c+"s"][cat[p][c]]) add(part[c+"s"][cat[p][c]], cat[p][c+"Clr"]);
+
+    for (var c of ["colour", "line"])
+    if(part.hasOwnProperty(c)) add(part[c], 'plain');
 
     function add(img, clr) {
       let temp = createImage(img.width, img.height);
 
       if(clr == 'plain') {
-        master.blend(img, 0,0,img.width,img.height,0,0,img.width,img.height, NORMAL);
+        // master.blend(img, 0,0,img.width,img.height,0,0,img.width,img.height, NORMAL);
+        // master.copy(img, 0,0,img.width,img.height,0,0,img.width,img.height);
+        master.push(img);
       } else {
         //  .blend() it with color on normal
-        temp.blend(colours[clr], 0,0,img.width,img.height,0,0,img.width,img.height, NORMAL);
+        temp.copy(colours[floor(random(45))], 0,0,img.width,img.height,0,0,img.width,img.height);
+
         //  .mask() that color clone with layer/pattern
+        // let temp = createImage(1,1);
+        // temp.loadPixels();
+        // temp.set(0,0,color(PALETTE[clr]));
+        // temp.updatePixels();
+        // temp.resize(images.width, images.height);
+
         temp.mask(img);
         //  .blend() master with it on normal
-        master.blend(temp, 0,0,img.width,img.height,0,0,img.width,img.height, NORMAL);
+        // master.blend(temp, 0,0,img.width,img.height,0,0,img.width,img.height, NORMAL);
+        // master.copy(temp, 0,0,img.width,img.height,0,0,img.width,img.height);
+        master.push(temp);
       }
     }
   }
 
-  return cat; //master image
-}
-
-function drawCat(cat) {
-  // just refference!!!!!!!!
-
-  // img(cat["legs/leftback"][0].base);
-  // img(cat["legs/leftback"][0].line);
-  // img(cat["legs/leftfront"][0].base);
-  // img(cat["legs/leftfront"][0].line);
-  //
-  // img(cat["tail"][0].base);
-  // img(cat["tail"][0].line);
-  //
-  // img(cat["body"][0].base);
-  // img(cat["body"][0].line);
-  //
-  // img(cat["legs/rightback"][0].base);
-  // img(cat["legs/rightback"][0].line);
-  // img(cat["legs/rightfront"][0].base);
-  // img(cat["legs/rightfront"][0].line);
-  //
-  // img(cat["head"][0].base);
-  // img(cat["head"][0].line);
-  //
-  // img(cat["face/mouth"][0].line);
-  // img(cat["face/nose"][0].line);
-  // img(cat["face/eyes"][0].base);
-  // img(cat["face/eyes"][0].line);
-
-  // img(cat["ears"][0].base);
-  // img(cat["ears"][0].line);
-  //
-  // img(cat["hair"][0].base);
-  // img(cat["hair"][0].line);
-
-  function img(path) {
-    image(path, 0, 0, width, height);
-  }
+  return master; //master image
 }
