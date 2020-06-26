@@ -70,6 +70,12 @@ function loadImages() {
   }
 }
 
+let loadingImg;
+
+function preload() {
+  loadingImg = loadImage("https://qbttr.github.io/catcreator/Assets//UI/loading.png", imageLoaded);
+}
+
 let PALETTE = [
   "#2c2c2c", "#4c4c4c", "#6f6f6f", "#cdcdcd", "#f4f2ef",
   "#505865", "#969fb0", "#aeb8ca", "#cbd4e6", "#e4ecfd",
@@ -148,11 +154,14 @@ function draw() {
     changeCat();
   }
   if(loading) {
+    let w = 512;
     background(100);
     noStroke();
-    fill(color("#f7cbca"));
-    let w = map(progress, 0, totalImages, 0, width)
-    rect(0, 0, w, height);
+    fill(color("#e47a80"));
+    let length = map(progress, 0, totalImages, width/2-w/2, width/2+w/2);
+    rect(width/2-w/2, height/2-w/2, length, w);
+
+    image(loadingImg, width/2-w/2, height/2-w/2);
     return;
   }
 
