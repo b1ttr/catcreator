@@ -1,5 +1,5 @@
 // Cat Creator
-// qbttr
+// qbttr & sweatersjpg
 
 
 let folders = {
@@ -8,7 +8,7 @@ let folders = {
   "Accessories/Hair":{ count:3, content:"line base" },
   "Accessories/Head":{ count:1, content:"base"},
   "Body": { count:1, content:"line base", patterns:13 , overlays:10 },
-  "Ears": { count:5, content:"line base", patterns:3 , overlays:4, accents:1, accentsMissing: [0] },
+  "Ears": { count:5, content:"line base", patterns:3 , overlays:4, accents:1 },
   "Face/Eyes": { count:4, content:"line base" },
   "Face/Mouth": { count:4, content:"line" },
   "Face/Nose": { count:3, content:"line" },
@@ -26,13 +26,17 @@ images.width = 1024;
 images.height = 1024;
 
 let loading = true;
-let totalImages = 221;
+let stoppedLoading = false;
+let totalImages = 225;
 let progress = 0;
 
 function imageLoaded(img) {
   if(img.width != images.width) img.resize(images.width, images.height);
   progress++;
-  if(progress >= totalImages) loading = false;
+  if(progress >= totalImages) {
+    console.log("Loading took " + round(millis() / 1000 * 100)/100 + "s to load " + progress + " images");
+    stoppedLoading = true;
+  }
 }
 
 function loadImages() {
@@ -89,8 +93,6 @@ function loadColours() {
   }
 }
 
-let firstCat;
-
 function setup() {
 
   cvs = createCanvas(800,800);
@@ -108,139 +110,52 @@ function setup() {
 
 }
 
-let timer = 0;
+let defaultCatConfig = {
+  "accessories/body/back": { index:-1 , base: 0 },
+  "accessories/body/collar": { index:4, base: 14 },
+  "accessories/hair":{ index:0, base:44 },
+  "accessories/head":{ index:-1, base:0 },
+  "body": { index:0, base:19, pattern:2, overlay:1, patternClr:2, overlayClr:4 },
+  "ears": {
+    index:0, base:19, pattern:0, overlay:0, accent:0,
+    patternClr:2, overlayClr:4, accentClr:4
+  },
+  "face/eyes": { index:0, base:34 },
+  "face/mouth": { index:0 },
+  "face/nose": { index:0 },
+  "hair": { index:0, base:4 },
+  "head": {
+    index:0, base:19, pattern:3, overlay:0, accent:-1, topaccent:0,
+    patternClr:3, overlayClr:4, accentClr:0, topaccentClr:2
+  },
+  "legs/leftfront": { index:0, base:19, pattern:1, overlay:0, patternClr:3, overlayClr:4 },
+  "legs/rightfront": { index:0, base:19, pattern:1, overlay:0, patternClr:3, overlayClr:4 },
+  "legs/leftback": { index:0, base:19, pattern:-1, overlay:-1, patternClr:0, overlayClr:0 },
+  "legs/rightback": { index:0, base:19, pattern:-1, overlay:-1, patternClr:0, overlayClr:0 },
+  "tail": { index:0, base:19, pattern:2, overlay:0, patternClr:2, overlayClr:4 },
+}
+
+let catConfig = Object.assign({}, defaultCatConfig);
+
+let masterCat;
 
 function draw() {
-  background(100);
+  background(color("#f7cbca"));
 
+  if(stoppedLoading) {
+    loading = false;
+    stoppedLoading = false;
+    changeCat();
+  }
   if(loading) {
-    fill(100);
+    background(100);
+    noStroke();
+    fill(color("#f7cbca"));
     let w = map(progress, 0, totalImages, 0, width)
     rect(0, 0, w, height);
     return;
   }
 
-  firstCat = {
-    "accessories/body/back": { index:-1 , base: 0 },
-    "accessories/body/collar": { index:1, base: 0 },
-    "accessories/hair":{ index:-1, base:0 },
-    "accessories/head":{ index:-1, base:0 },
-    "body": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-    "ears": {
-      index:0, base:0, pattern:0, overlay:0, acctent:0,
-      patternClr:0, overlayClr:0, acctentClr:0
-    },
-    "face/eyes": { index:0, base:0 },
-    "face/mouth": { index:0 },
-    "face/nose": { index:0 },
-    "hair": { index:0, base:0 },
-    "head": {
-      index:0, base:0, pattern:0, overlay:0, acctent:0, topacctent:0,
-      patternClr:0, overlayClr:0, acctentClr:0, topacctentClr:0
-    },
-    "legs/leftback": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-    "legs/leftfront": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-    "legs/rightback": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-    "legs/rightfront": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-    "tail": { index:0, base:0, pattern:0, overlay:0, patternClr:0, overlayClr:0 },
-  }
-
-  for (var k of Object.keys(folders)) {
-    let lk = k.toLowerCase();
-    if(lk.includes("accessories")) firstCat[lk].index = floor(random(-1,folders[k].count));
-    else firstCat[lk].index = floor(random(folders[k].count));
-    console.log(lk + " " + firstCat[lk]);
-    for (var c of ["pattern", "overlay", "accent", "topaccent"])
-    if(firstCat[lk].hasOwnProperty(c)) firstCat[lk][c] = floor(random(folders[k][c+"s"]));
-  }
-
-  timer = millis();
-  console.log("start genCat");
-
-  let cat = genCat(firstCat);
-
-  console.log("genCat took: " + (millis() - timer)/1000 + "s");
-
-  for (var i of cat) {
-    image(i, 0, 0, width, height);
-  }
-  // image(cat, 0, 0, width, height);
-
+  drawCat(masterCat);
   noLoop();
-
-}
-
-function genCat(cat) {
-  let I = images;
-
-  // create master image
-  // let master = createImage(images.width, images.height);
-  let master = [];
-
-  part("legs/leftback");
-  part("legs/leftfront");
-
-  part("tail");
-
-  part("body");
-
-  part("accessories/body/collar");
-  part("accessories/body/back");
-
-  part("legs/rightback");
-  part("legs/rightfront");
-
-  part("head");
-  part("face/mouth");
-  part("face/nose");
-  part("face/eyes");
-  part("accessories/head");
-
-  part("ears");
-  part("hair");
-  part("accessories/hair");
-
-
-  function part(p) {
-    if(cat[p].index < 0) return;
-    let part = I[p][cat[p].index];
-    console.log(p + " " + cat[p].index);
-    // for (var c of ["base", "line", "colour"])
-    // if(part.hasOwnProperty(c)) add(part[c], c == "base" ? cat[p].base:'plain');
-    if(part.hasOwnProperty("base")) add(part.base, cat[p].base);
-
-    for (var c of ["pattern", "overlay", "accent", "topaccent"])
-    if(part.hasOwnProperty(c+"s") && part[c+"s"][cat[p][c]]) add(part[c+"s"][cat[p][c]], cat[p][c+"Clr"]);
-
-    for (var c of ["colour", "line"])
-    if(part.hasOwnProperty(c)) add(part[c], 'plain');
-
-    function add(img, clr) {
-      let temp = createImage(img.width, img.height);
-
-      if(clr == 'plain') {
-        // master.blend(img, 0,0,img.width,img.height,0,0,img.width,img.height, NORMAL);
-        // master.copy(img, 0,0,img.width,img.height,0,0,img.width,img.height);
-        master.push(img);
-      } else {
-        //  .blend() it with color on normal
-        temp.copy(colours[floor(random(45))], 0,0,img.width,img.height,0,0,img.width,img.height);
-
-        //  .mask() that color clone with layer/pattern
-        // let temp = createImage(1,1);
-        // temp.loadPixels();
-        // temp.set(0,0,color(PALETTE[clr]));
-        // temp.updatePixels();
-        // temp.resize(images.width, images.height);
-
-        temp.mask(img);
-        //  .blend() master with it on normal
-        // master.blend(temp, 0,0,img.width,img.height,0,0,img.width,img.height, NORMAL);
-        // master.copy(temp, 0,0,img.width,img.height,0,0,img.width,img.height);
-        master.push(temp);
-      }
-    }
-  }
-
-  return master; //master image
 }
