@@ -32,13 +32,13 @@ function genPart(p) {
   if(part.hasOwnProperty(c)) add(part[c], 'plain');
 
   function add(img, clr) {
-    let temp = createImage(img.width, img.height);
-
     if(clr == 'plain') {
       // imgs.copy(img, 0,0,img.width,img.height,0,0,img.width,img.height);
       imgs[p].push(img);
     } else {
-      temp.copy(colours[clr], 0,0,img.width,img.height,0,0,img.width,img.height);
+      // let temp = createImage(img.width, img.height);
+      // temp.copy(colours[clr], 0,0,img.width,img.height,0,0,img.width,img.height);
+      let temp = colours[clr].get();
       temp.mask(img);
       // imgs.copy(temp, 0,0,img.width,img.height,0,0,img.width,img.height);
       imgs[p].push(temp);
@@ -47,7 +47,7 @@ function genPart(p) {
 }
 
 function changeCat() {
-  time("genCat");
+  timeAVG("genCat");
   loop();
 }
 
@@ -77,7 +77,8 @@ function randomizeCat(cat) {
     [40,41,28,4],
     [23,27,19,2],
     [32,33,28],
-    [22,18,23]
+    [22,18,23],
+    [34,39,40,41,42,43]
   ];
   let pal = random(pals);
 

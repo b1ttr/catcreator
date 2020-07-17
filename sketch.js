@@ -70,12 +70,6 @@ function loadImages() {
   }
 }
 
-let loadingImg;
-
-function preload() {
-  loadingImg = loadImage("https://qbttr.github.io/catcreator/Assets//UI/loading.png", imageLoaded);
-}
-
 let PALETTE = [
   "#2c2c2c", "#4c4c4c", "#6f6f6f", "#cdcdcd", "#f4f2ef",
   "#505865", "#969fb0", "#aeb8ca", "#cbd4e6", "#e4ecfd",
@@ -99,6 +93,10 @@ function loadColours() {
   }
 }
 
+let loadingImg;
+let loadingImgLogo;
+preImgLoaded = false;
+
 function setup() {
 
   cvs = createCanvas(800,800);
@@ -110,6 +108,12 @@ function setup() {
   // ctx.imageSmoothingEnabled = false;
   //
   // p5.disableFriendlyErrors = true;
+
+  loadingImgLogo = loadImage("https://qbttr.github.io/catcreator/Assets/UI/logoLoading.png");
+  loadingImg = loadImage(
+    "https://qbttr.github.io/catcreator/Assets/UI/loading.png",
+    () => { preImgLoaded = true }
+  );
 
   loadColours();
   loadImages();
@@ -146,24 +150,26 @@ let catConfig = Object.assign({}, defaultCatConfig);
 let masterCat;
 
 function draw() {
-  background(color("#f7cbca"));
+  background(color("#ffc2b8"));
 
   if(stoppedLoading) {
     loading = false;
     stoppedLoading = false;
     changeCat();
   }
-  if(loading) {
-    let w = 512;
-    background(100);
+  if(loading && preImgLoaded) {
+    let w = 300;
     noStroke();
-    fill(color("#e47a80"));
-    let length = map(progress, 0, totalImages, width/2-w/2, width/2+w/2);
+    fill("#f4f2ef");
+    rect(width/2-w/2, height/2-w/2, w, w);
+    fill(color("#ff9f8f"));
+    let length = map(progress, 0, totalImages, 0, w);
     rect(width/2-w/2, height/2-w/2, length, w);
 
-    image(loadingImg, width/2-w/2, height/2-w/2);
+    image(loadingImg, width/2-w/2, height/2-w/2, w, w);
+    image(loadingImgLogo, width/2-w/2, height/2-w/2, w, w);
     return;
-  }
+  } else if(loading) return;
 
   drawCat(masterCat);
   noLoop();
