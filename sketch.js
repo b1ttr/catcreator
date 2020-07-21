@@ -21,13 +21,38 @@ let folders = {
   "Tail":{ count:6, content:"line base", patterns:3, overlays:4 },
 };
 
+let uiFolders = {
+  "UI/Accesories": {},
+  "UI/Accesories/Body": { count:4 },
+  "UI/Accesories/Collars": { count:5 },
+  "UI/Accesories/Face": { count: 1 },
+  "UI/Accesories/Head": { count: 3 },
+  "UI/Body": { Base:1, Patterns:13, Overlays:10 },
+  "UI/Ears": { Base:5, Patterns:3 , Overlays:4, Accents:1 },
+  "UI/Face": {},
+  "UI/Face/Eyes": { Base:4 },
+  "UI/Face/Mouth": { Base:2 },
+  "UI/Face/Nose": { Base:3 },
+  "UI/Hair": { Base:2 },
+  "UI/Head": { Base:1, Patterns:4 , Overlays:7, "Accents 1":1, "Accents 2":2 },
+  "UI/Front Legs": { Base:1, Patterns:3 , Overlays:4 },
+  "UI/Back Legs": { Base:1, Patterns:3 , Overlays:4 },
+  "UI/Tail": { Base:6, Patterns:3, Overlays:4 },
+  "UI": [
+    "background",
+    "border",
+    "box base",
+    "box"
+  ]
+}
+
 let images = {};
 images.width = 1024;
 images.height = 1024;
 
 let loading = true;
 let stoppedLoading = false;
-let totalImages = 225;
+totalImages = 0;
 let progress = 0;
 
 function imageLoaded(img) {
@@ -68,6 +93,32 @@ function loadImages() {
 
     return item;
   }
+
+  images.ui = {};
+
+  for (let k of Object.keys(uiFolders)) {
+    let prefix = "https://qbttr.github.io/catcreator/Assets/";
+    let suffix = ".png";
+    let folder = uiFolders[k];
+    let lk = k.toLowerCase();
+
+    images.ui[lk] = {};
+    images.ui[lk].base = loadImage(prefix+k+"/base"+suffix, imageLoaded);
+    images.ui[lk].hover = loadImage(prefix+k+"/hover"+suffix, imageLoaded);
+    images.ui[lk].plain = loadImage(prefix+k+"/plain"+suffix, imageLoaded);
+
+    for (var c of ["Base", "Patterns", "Overlays", "Accents", "Accents 1", "Accents 2"])
+    if(folder.hasOwnProperty(c)) {
+      let lc = c.toLowerCase();
+      images.ui[lk][lc] = {};
+      images.ui[lk][lc].base = loadImage(prefix+k+"/"+c+"/base"+suffix, imageLoaded);
+      images.ui[lk][lc].hover = loadImage(prefix+k+"/"+c+"/hover"+suffix, imageLoaded);
+      images.ui[lk][lc].plain = loadImage(prefix+k+"/"+c+"/plain"+suffix, imageLoaded);
+      for (var i = 0; i < folder[c]; i++) {
+        images.ui[lk][lc][i] = loadImage(prefix+k+"/"+c+"/"+i+suffix, imageLoaded);
+      }
+    }
+  }
 }
 
 let PALETTE = [
@@ -100,20 +151,29 @@ preImgLoaded = false;
 function setup() {
 
   cvs = createCanvas(800,800);
-  // canvasElement = cvs.elt;
-  // ctx = canvasElement.getContext('2d');
-  // ctx.mozImageSmoothingEnabled = false;
-  // ctx.webkitImageSmoothingEnabled = false;
-  // ctx.msImageSmoothingEnabled = false;
-  // ctx.imageSmoothingEnabled = false;
-  //
-  // p5.disableFriendlyErrors = true;
+  canvasElement = cvs.elt;
+  ctx = canvasElement.getContext('2d');
+  ctx.mozImageSmoothingEnabled = false;
+  ctx.webkitImageSmoothingEnabled = false;
+  ctx.msImageSmoothingEnabled = false;
+  ctx.imageSmoothingEnabled = false;
+
+  p5.disableFriendlyErrors = true;
 
   loadingImgLogo = loadImage("https://qbttr.github.io/catcreator/Assets/UI/logoLoading.png");
+  totalImages--;
   loadingImg = loadImage(
     "https://qbttr.github.io/catcreator/Assets/UI/loading.png",
     () => { preImgLoaded = true }
   );
+
+  loadImage = (function() {
+    var cached_function = loadImage;
+    return function() {
+      totalImages++;
+      return cached_function.apply(this, arguments); // use .apply() to call it
+    };
+  })();
 
   loadColours();
   loadImages();
