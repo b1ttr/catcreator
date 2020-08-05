@@ -22,28 +22,29 @@ let folders = {
 };
 
 let uiFolders = {
-  "UI/Accesories": {},
-  "UI/Accesories/Body": { count:4 },
-  "UI/Accesories/Collars": { count:5 },
-  "UI/Accesories/Face": { count: 1 },
-  "UI/Accesories/Head": { count: 3 },
+  "UI/Accessories": {},
+  "UI/Accessories/Body": { count:4 },
+  "UI/Accessories/Collars": { count:5 },
+  "UI/Accessories/Face": { count: 1 },
+  "UI/Accessories/Head": { count: 3 },
   "UI/Body": { Base:1, Patterns:13, Overlays:10 },
   "UI/Ears": { Base:5, Patterns:3 , Overlays:4, Accents:1 },
   "UI/Face": {},
-  "UI/Face/Eyes": { Base:4 },
-  "UI/Face/Mouth": { Base:2 },
-  "UI/Face/Nose": { Base:3 },
+  "UI/Face/Eyes": { count:4 },
+  "UI/Face/Mouth": { count:2 },
+  "UI/Face/Nose": { count:3 },
   "UI/Hair": { Base:2 },
   "UI/Head": { Base:1, Patterns:4 , Overlays:7, "Accents 1":1, "Accents 2":2 },
   "UI/Front Legs": { Base:1, Patterns:3 , Overlays:4 },
   "UI/Back Legs": { Base:1, Patterns:3 , Overlays:4 },
-  "UI/Tail": { Base:6, Patterns:3, Overlays:4 },
-  "UI": [
-    "background",
-    "border",
-    "box base",
-    "box"
-  ]
+  "UI/Tail": { Base:6, Patterns:3, Overlays:4 }
+  // ,
+  // "UI": [
+  //   "background",
+  //   "border",
+  //   "box base",
+  //   "box"
+  // ]
 }
 
 let images = {};
@@ -56,12 +57,16 @@ totalImages = 0;
 let progress = 0;
 
 function imageLoaded(img) {
-  if(img.width != images.width) img.resize(images.width, images.height);
+  // if(img.width != images.width) img.resize(images.width, images.height);
   progress++;
   if(progress >= totalImages) {
     console.log("Loading took " + round(millis() / 1000 * 100)/100 + "s to load " + progress + " images");
     stoppedLoading = true;
   }
+}
+
+function imageFailed(img) {
+  totalImages--;
 }
 
 function loadImages() {
@@ -81,14 +86,14 @@ function loadImages() {
     let item = {};
 
     for (var c of ["line", "base", "colour"])
-    if(info.content.includes(c)) item[c] = loadImage(prefix+path+"/"+index+"/" +c+suffix, imageLoaded);
+    if(info.content.includes(c)) item[c] = loadImage(prefix+path+"/"+index+"/" +c+suffix, imageLoaded, imageFailed);
 
     for (var c of ["patterns", "overlays", "accents", "topaccents"])
     if(info.hasOwnProperty(c)) {
       item[c] = new Array(info[c]);
       for (var i = 0; i < item[c].length; i++)
       if(info.hasOwnProperty(c+"Missing") && info[c+"Missing"].includes(i)) item[c][i] = false;
-      else item[c][i] = loadImage(prefix+path+"/"+index+"/"+c+"/"+i+suffix, imageLoaded);
+      else item[c][i] = loadImage(prefix+path+"/"+index+"/"+c+"/"+i+suffix, imageLoaded, imageFailed);
     }
 
     return item;
@@ -103,19 +108,25 @@ function loadImages() {
     let lk = k.toLowerCase();
 
     images.ui[lk] = {};
-    images.ui[lk].base = loadImage(prefix+k+"/base"+suffix, imageLoaded);
-    images.ui[lk].hover = loadImage(prefix+k+"/hover"+suffix, imageLoaded);
-    images.ui[lk].plain = loadImage(prefix+k+"/plain"+suffix, imageLoaded);
+    images.ui[lk].base = loadImage(prefix+k+"/base"+suffix, imageLoaded, imageFailed);
+    images.ui[lk].hover = loadImage(prefix+k+"/hover"+suffix, imageLoaded, imageFailed);
+    images.ui[lk].plain = loadImage(prefix+k+"/plain"+suffix, imageLoaded, imageFailed);
+
+    if(folder.hasOwnProperty("count")) {
+      for (var i = 0; i < folder.count; i++) {
+        images.ui[lk][i] = loadImage(prefix+k+"/"+i+suffix, imageLoaded, imageFailed);
+      }
+    }
 
     for (var c of ["Base", "Patterns", "Overlays", "Accents", "Accents 1", "Accents 2"])
     if(folder.hasOwnProperty(c)) {
       let lc = c.toLowerCase();
       images.ui[lk][lc] = {};
-      images.ui[lk][lc].base = loadImage(prefix+k+"/"+c+"/base"+suffix, imageLoaded);
-      images.ui[lk][lc].hover = loadImage(prefix+k+"/"+c+"/hover"+suffix, imageLoaded);
-      images.ui[lk][lc].plain = loadImage(prefix+k+"/"+c+"/plain"+suffix, imageLoaded);
+      images.ui[lk][lc].base = loadImage(prefix+k+"/"+c+"/base"+suffix, imageLoaded, imageFailed);
+      images.ui[lk][lc].hover = loadImage(prefix+k+"/"+c+"/hover"+suffix, imageLoaded, imageFailed);
+      images.ui[lk][lc].plain = loadImage(prefix+k+"/"+c+"/plain"+suffix, imageLoaded, imageFailed);
       for (var i = 0; i < folder[c]; i++) {
-        images.ui[lk][lc][i] = loadImage(prefix+k+"/"+c+"/"+i+suffix, imageLoaded);
+        images.ui[lk][lc][i] = loadImage(prefix+k+"/"+c+"/"+i+suffix, imageLoaded, imageFailed);
       }
     }
   }
